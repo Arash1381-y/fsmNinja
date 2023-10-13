@@ -1,3 +1,1 @@
-# Finite State Machine Designer
-
-http://madebyevan.com/fsm/
+# github pages branch

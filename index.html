@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Finite State Machine Designer - by Evan Wallace</title>
+    <meta charset="utf-8">
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/jsoneditor@9.10.3/dist/jsoneditor.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/jsoneditor@9.10.3/dist/jsoneditor.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.css" rel="stylesheet">
+
+
+    <script src="fsm.js"></script>
+
+
+    <style>
+
+
+        .card:hover {
+            box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1);
+        }
+
+        button {
+            width: 100px;
+        }
+
+        .download {
+            align-items: center;
+            display: flex;
+            height: 80px;
+
+        }
+
+        .options {
+            width: 200px;
+            display: flex;
+        }
+
+
+        .jsoneditor {
+            border: none;
+        }
+
+        .jsoneditor-field {
+            font-size: 22px !important;
+        }
+
+        .jsoneditor-value {
+            font-size: 22px !important;
+        }
+
+        .jsoneditor-string {
+            font-size: 22px !important;
+        }
+
+        .jsoneditor-readonly {
+            font-size: 22px !important;
+        }
+
+
+        /*div.jsoneditor{*/
+        /*    height: 800px;*/
+        /*}*/
+
+        /*div.jsoneditor,*/
+        /*div.jsoneditor-menu {*/
+        /*    border-color: #4b4b4b;*/
+        /*}*/
+
+        /*div.jsoneditor-menu {*/
+        /*    background-color: #4b4b4b;*/
+        /*}*/
+
+        /*div.jsoneditor-tree,*/
+        /*div.jsoneditor textarea.jsoneditor-text {*/
+        /*    background-color: #666666;*/
+        /*    color: #ffffff;*/
+        /*}*/
+
+        /*div.jsoneditor-field,*/
+        /*div.jsoneditor-value {*/
+        /*    color: #ffffff;*/
+        /*}*/
+
+        /*table.jsoneditor-search div.jsoneditor-frame {*/
+        /*    background: #808080;*/
+        /*}*/
+
+        /*tr.jsoneditor-highlight,*/
+        /*tr.jsoneditor-selected {*/
+        /*    background-color: #808080;*/
+        /*}*/
+
+        /*div.jsoneditor-field[contenteditable=true]:focus,*/
+        /*div.jsoneditor-field[contenteditable=true]:hover,*/
+        /*div.jsoneditor-value[contenteditable=true]:focus,*/
+        /*div.jsoneditor-value[contenteditable=true]:hover,*/
+        /*div.jsoneditor-field.jsoneditor-highlight,*/
+        /*div.jsoneditor-value.jsoneditor-highlight {*/
+        /*    background-color: #808080;*/
+        /*    border-color: #808080;*/
+        /*}*/
+
+        /*div.jsoneditor-field.highlight-active,*/
+        /*div.jsoneditor-field.highlight-active:focus,*/
+        /*div.jsoneditor-field.highlight-active:hover,*/
+        /*div.jsoneditor-value.highlight-active,*/
+        /*div.jsoneditor-value.highlight-active:focus,*/
+        /*div.jsoneditor-value.highlight-active:hover {*/
+        /*    background-color: #b1b1b1;*/
+        /*    border-color: #b1b1b1;*/
+        /*}*/
+
+        /*div.jsoneditor-tree button:focus {*/
+        /*    background-color: #868686;*/
+        /*}*/
+
+        /*!* coloring of JSON in tree mode *!*/
+        /*div.jsoneditor-readonly {*/
+        /*    color: #acacac;*/
+        /*}*/
+
+        /*div.jsoneditor td.jsoneditor-separator {*/
+        /*    color: #acacac;*/
+        /*}*/
+
+        /*div.jsoneditor-value.jsoneditor-string {*/
+        /*    color: #00ff88;*/
+        /*}*/
+
+        /*div.jsoneditor-value.jsoneditor-object,*/
+        /*div.jsoneditor-value.jsoneditor-array {*/
+        /*    color: #bababa;*/
+        /*}*/
+
+        /*div.jsoneditor-value.jsoneditor-number {*/
+        /*    color: #ff4040;*/
+        /*}*/
+
+        /*div.jsoneditor-value.jsoneditor-boolean {*/
+        /*    color: #ff8048;*/
+        /*}*/
+
+        /*div.jsoneditor-value.jsoneditor-null {*/
+        /*    color: #49a7fc;*/
+        /*}*/
+
+        /*div.jsoneditor-value.jsoneditor-invalid {*/
+        /*    color: white;*/
+        /*}*/
+
+
+        #panel {
+            margin-left: auto;
+            width: 400px;
+        }
+
+
+    </style>
+</head>
+
+
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+
+<nav class="navbar border-bottom border-body px-4 shadow-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">DEVELOPED WITH LOVE ❤</a>
+        <a class="navbar-brand fw-bolder text-secondary" href="#">Finite System Machine Designer</a>
+
+        <div>
+            <!--            add star me-->
+            <a class="btn btn-outline-primary" href="https://github.com/Arash1381-y/fsmNinja.git" target="_blank" role="button">Support Me</a>
+        </div>
+    </div>
+</nav>
+
+
+<div style="display: flex; padding-left: 8rem; padding-right: 8rem; margin: 1rem">
+    <canvas class="rounded bg-white shadow-lg" id="canvas" width="1200px" height="700px"></canvas>
+    <div class="rounded bg-white shadow-lg" id="panel">
+        <div id="jsoneditor"></div>
+
+    </div>
+
+</div>
+
+<div style="margin-left: 9rem; margin-right: 9rem;" class="p-2">
+
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="card btn text-center bg-success border-0" onclick="saveAsJson();">
+                <div class="card-body">
+                    <h1 class="card-title text-white">JSON</h1>
+                    <p class="h-3 text-white"> Copy to Clipboard</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card btn text-center bg-warning border-0" onclick="saveAsLaTeX();">
+                <div class="card-body">
+                    <h1 class="card-title text-white">LATEX</h1>
+                    <p class="h-3 text-white"> Copy to Clipboard</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card btn text-center bg-primary" onclick="saveAsPNG();">
+                <div class="card-body">
+                    <h1 class="card-title text-white">PNG</h1>
+                    <p class="h-3 text-white"> Copy to Clipboard</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<br>
+<br>
+<div style="margin-left: 9rem; margin-right: 9rem;" class="p-2">
+
+
+    <p>The big white box above is the FSM designer.&nbsp; Here's how to use it:</p>
+    <ul>
+        <li><b>Add a state:</b> double-click on the canvas</li>
+        <li><b>Add an arrow:</b> shift-drag on the canvas</li>
+        <li><b>Move something:</b> drag it around</li>
+        <li><b>Delete something:</b> click it and press the delete key (not the backspace key)</li>
+    </ul>
+    <ul>
+        <li><b>Make accept state:</b> double-click on an existing state</li>
+        <li><b>Type numeric subscript:</b> put an underscore before the number (like "S_0")</li>
+        <li><b>Type greek letter:</b> put a backslash before it (like "\beta")</li>
+    </ul>
+</div>
+
+
+</body>
+</html>
