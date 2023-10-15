@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>FSM Ninja</title>
+    <meta charset="utf-8">
+
+    <meta name="google-site-verification" content="i0vmn4IP7f-3iowQql-H9hjpWkS_FjvrXaKsN3mG5Gw"/>
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="icon.ico"/>
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/jsoneditor@9.10.3/dist/jsoneditor.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/jsoneditor@9.10.3/dist/jsoneditor.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.css" rel="stylesheet">
+
+
+    <script src="fsm.js"></script>
+    <script>theme = "dark"</script>
+
+
+    <style>
+
+
+        .card:hover {
+            box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1);
+        }
+
+        button {
+            width: 100px;
+        }
+
+        #canvas {
+            background: #16191c;
+        }
+
+        .download {
+            align-items: center;
+            display: flex;
+            height: 80px;
+
+        }
+
+        .options {
+            width: 200px;
+            display: flex;
+        }
+
+        #panel {
+            display: none;
+        }
+
+        #board {
+            display: flex;
+            padding-left: 8rem;
+            padding-right: 8rem;
+            margin: 1rem;
+        }
+
+        /* Display the options class on screens with a minimum width of 768px (adjust as needed) */
+        @media (min-width: 1000px) {
+            #panel {
+                display: flex;
+            }
+        }
+
+        @media only screen and (max-width: 1000px) {
+            #board {
+                display: flex;
+                justify-content: center;
+            }
+        }
+
+        .jsoneditor {
+            border: none;
+            background: #16191c;
+        }
+
+        /*div.jsoneditor{*/
+        /*    height: 800px;*/
+        /*}*/
+
+        div.jsoneditor,
+        div.jsoneditor-menu {
+            border-color: #16191c;
+        }
+
+        div.jsoneditor-menu {
+            background-color: #16191c;
+        }
+
+        div.jsoneditor-tree,
+        div.jsoneditor textarea.jsoneditor-text {
+            background-color: #16191c;
+            color: #ffffff;
+        }
+
+        div.jsoneditor-field,
+        div.jsoneditor-value {
+            color: #ffffff;
+        }
+
+        table.jsoneditor-search div.jsoneditor-frame {
+            background: #808080;
+        }
+
+        tr.jsoneditor-highlight,
+        tr.jsoneditor-selected {
+            background-color: #808080;
+        }
+
+        div.jsoneditor-field[contenteditable=true]:focus,
+        div.jsoneditor-field[contenteditable=true]:hover,
+        div.jsoneditor-value[contenteditable=true]:focus,
+        div.jsoneditor-value[contenteditable=true]:hover,
+        div.jsoneditor-field.jsoneditor-highlight,
+        div.jsoneditor-value.jsoneditor-highlight {
+            background-color: #808080;
+            border-color: #808080;
+        }
+
+        div.jsoneditor-field.highlight-active,
+        div.jsoneditor-field.highlight-active:focus,
+        div.jsoneditor-field.highlight-active:hover,
+        div.jsoneditor-value.highlight-active,
+        div.jsoneditor-value.highlight-active:focus,
+        div.jsoneditor-value.highlight-active:hover {
+            background-color: #b1b1b1;
+            border-color: #b1b1b1;
+        }
+
+        div.jsoneditor-tree button:focus {
+            background-color: #868686;
+        }
+
+        /*!* coloring of JSON in tree mode *!*/
+        div.jsoneditor-readonly {
+            color: #acacac;
+        }
+
+        div.jsoneditor td.jsoneditor-separator {
+            color: #acacac;
+        }
+
+        div.jsoneditor-value.jsoneditor-string {
+            color: #00ff88;
+        }
+
+        div.jsoneditor-value.jsoneditor-object,
+        div.jsoneditor-value.jsoneditor-array {
+            color: #bababa;
+        }
+
+        div.jsoneditor-value.jsoneditor-number {
+            color: #ff4040;
+        }
+
+        div.jsoneditor-value.jsoneditor-boolean {
+            color: #ff8048;
+        }
+
+        div.jsoneditor-value.jsoneditor-null {
+            color: #49a7fc;
+        }
+
+        div.jsoneditor-value.jsoneditor-invalid {
+            color: white;
+        }
+
+
+        #panel {
+            margin-left: auto;
+        }
+
+
+    </style>
+</head>
+
+
+<body class="bg-dark text-light">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+
+<nav class="navbar border-bottom border-body px-4 shadow-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand text-light" href="#">DEVELOPED WITH LOVE ❤</a>
+        <a class="navbar-brand fw-bolder text-secondary" href="#">Finite System Machine Designer</a>
+
+        <div>
+            <!--            add star me-->
+            <a class="btn btn-dark border-light" href="https://github.com/Arash1381-y/fsmNinja.git" target="_blank"
+               role="button">Support Me</a>
+            <a class="btn btn-light" href="index.html" role="button">Light Mode</a>
+        </div>
+    </div>
+</nav>
+
+
+<div id="board">
+    <canvas class="rounded shadow-lg" id="canvas"></canvas>
+    <div class="rounded bg-dark shadow-lg" id="panel">
+        <div id="jsoneditor"></div>
+
+    </div>
+
+</div>
+
+<div style="margin-left: 9rem; margin-right: 9rem;" class="p-2">
+
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="card btn text-center bg-success border-0" onclick="saveAsJson();">
+                <div class="card-body">
+                    <h1 class="card-title text-white">JSON</h1>
+                    <p class="h-3 text-white"> Copy to Clipboard</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card btn text-center bg-warning border-0" onclick="saveAsLaTeX();">
+                <div class="card-body">
+                    <h1 class="card-title text-white">LATEX</h1>
+                    <p class="h-3 text-white"> Copy to Clipboard</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card btn text-center bg-primary" onclick="saveAsPNG();">
+                <div class="card-body">
+                    <h1 class="card-title text-white">PNG</h1>
+                    <p class="h-3 text-white"> Copy to Clipboard</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<br>
+<br>
+<div style="margin-left: 9rem; margin-right: 9rem;" class="p-2">
+
+
+    <h2 class="display-1 text-primary fw-bolder border-bottom">Tutorial</h2>
+
+    <p>The Left box above
+        <mark class="lead">(canvas)</mark>
+        is the <b>FSM designer</b>.&nbsp; Here's how to use it:
+    </p>
+
+    <h4 class="display-6 text-primary"> Adding States</h4>
+
+    <h5>Action:</h5>
+    <p>
+        <mark>Double-click</mark>
+        on the canvas
+    </p>
+
+    <h5>Description</h5>
+    <P>
+        Create a single
+        <mark>state</mark>
+        and put the cursor in it.
+    </P>
+
+
+    <h4 class="display-6 text-primary"> Adding Links</h4>
+
+    <h5>Action:</h5>
+    <p>
+        <mark>Shift + Drag</mark>
+        on the canvas.
+    </p>
+
+    <h5>Description</h5>
+    <P>
+
+
+        Create an edge starting from the
+        <mark>cursor location</mark>
+        . If the cursor is on the state, then the link will begin from that state.
+
+    </P>
+
+    <h4 class="display-6 text-primary"> Adding States</h4>
+
+    <h5>Move:</h5>
+    <p>
+        <mark>Drag</mark>
+        states or links over the canvas
+    </p>
+
+    <h5>Description</h5>
+    <P>
+        Move states/links around the canvas.
+    </P>
+
+    <h4 class="display-6 text-primary"> Accept State</h4>
+
+    <h5>Action:</h5>
+    <p>
+        <mark>Double-click</mark>
+        on the created state to make it
+        <mark>Accept State</mark>
+        or revert back to
+        <mark>Normal State</mark>
+    </p>
+
+    <h5>Description</h5>
+    <P>
+        Control the state's status, toggling between accepted and normal states within the FSM.
+    </P>
+
+
+    <h4 class="display-6 text-primary">Delete</h4>
+
+    <h5>Action:</h5>
+    <p>
+        <mark>Click</mark>
+        on the state/link and press
+        <mark>delete</mark>
+        (In Mac use
+        <mark>fn + backspace</mark>
+        )
+    </p>
+
+    <h5>Description</h5>
+    <P>
+        Remove a
+        <mark>state</mark>
+        or
+        <mark>link</mark>
+        .
+    </P>
+
+
+    <h4 class="display-6 text-primary">Modify Props</h4>
+
+    <h5>Action:</h5>
+    <p>
+        <mark>Click</mark>
+        on the
+        <mark>small square</mark>
+        near the specific field to edit it.
+    </p>
+
+    <h5>Description</h5>
+    <P>
+        Can be used to add optional properties to the FSM.
+    </P>
+
+
+</div>
+
+
+</body>
+
+<footer class="blockquote-footer align-self-center text-center">
+    Created By Arash and Evan
+</footer>
+</html>
