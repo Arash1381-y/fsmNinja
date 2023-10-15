@@ -501,7 +501,7 @@ function create_json_editor() {
     }
 
     editor = new JSONEditor(container, options)
-    container.setAttribute("style", `width:${400 * screenRatio}px`)
+    container.setAttribute("style", `width:${300 * screenRatio}px`)
 
     // set json
     const initialJson = {
@@ -589,7 +589,7 @@ function check_if_mobile_small() {
             "\t\t\n" +
             "\t\t<div class=\"contant_box_404\">\n" +
             "\t\t<h3 class=\"h2\">\n" +
-            "\t\tYour Device Is To Small For displaying Contets\n" +
+            "\t\tMobiles and Tablets are not supported yet! We are open to your PRs\n" +
             "\t\t</h3>\n" +
             "\t\t\n" +
             "\t\t\n" +
@@ -770,7 +770,7 @@ window.onload = function () {
     panel = document.getElementById('panel');
     canvas.setAttribute("width", `${1200 * screen.width / 2000}px`);
     canvas.setAttribute("height", `${700}px`);
-    panel.setAttribute("width", `${400 * screen.width / 2000}px`)
+    panel.setAttribute("width", `${300 * screen.width / 2000}px`)
 
     create_json_editor();
     // restoreBackup();
@@ -938,9 +938,12 @@ document.onkeydown = function (e) {
         if (key === " " && in_canvas) {
             e.preventDefault()
         }
-        selectedObject.text += e.key
-        resetCaret();
-        draw();
+        if (key.length === 1) {
+            selectedObject.text += e.key
+            resetCaret();
+            draw();
+            return true
+        }
         return true
     }
 };
