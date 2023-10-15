@@ -4,6 +4,8 @@
     <title>FSM Ninja</title>
     <meta charset="utf-8">
 
+    <meta name="google-site-verification" content="i0vmn4IP7f-3iowQql-H9hjpWkS_FjvrXaKsN3mG5Gw" />
+
 
     <link rel="shortcut icon" type="image/x-icon" href="icon.ico"/>
 
@@ -45,6 +47,30 @@
             display: flex;
         }
 
+        #panel {
+            display: none;
+        }
+
+        #board {
+            display: flex;
+            padding-left: 8rem;
+            padding-right: 8rem;
+            margin: 1rem;
+        }
+
+        /* Display the options class on screens with a minimum width of 768px (adjust as needed) */
+        @media (min-width: 1000px) {
+            #panel {
+                display: flex;
+            }
+        }
+
+        @media only screen and (max-width: 1000px) {
+            #board {
+                display: flex;
+                justify-content: center;
+            }
+        }
 
         .jsoneditor {
             border: none;
@@ -172,7 +198,7 @@
 </nav>
 
 
-<div style="display: flex; padding-left: 8rem; padding-right: 8rem; margin: 1rem">
+<div id="board">
     <canvas class="rounded bg-white shadow-lg" id="canvas"></canvas>
     <div class="rounded bg-white shadow-lg" id="panel">
         <div id="jsoneditor"></div>
@@ -278,7 +304,8 @@
         <mark>Double-click</mark>
         on the created state to make it
         <mark>Accept State</mark>
-        or revert back to <mark>Normal State</mark>
+        or revert back to
+        <mark>Normal State</mark>
     </p>
 
     <h5>Description</h5>
@@ -292,7 +319,11 @@
     <h5>Action:</h5>
     <p>
         <mark>Click</mark>
-        on the state/link and press <mark>delete</mark> (In Mac use <mark>fn + backspace</mark>)
+        on the state/link and press
+        <mark>delete</mark>
+        (In Mac use
+        <mark>fn + backspace</mark>
+        )
     </p>
 
     <h5>Description</h5>
@@ -300,7 +331,8 @@
         Remove a
         <mark>state</mark>
         or
-        <mark>link</mark>.
+        <mark>link</mark>
+        .
     </P>
 
 
@@ -309,7 +341,9 @@
     <h5>Action:</h5>
     <p>
         <mark>Click</mark>
-        on the <mark>small square</mark> near the specific field to edit it.
+        on the
+        <mark>small square</mark>
+        near the specific field to edit it.
     </p>
 
     <h5>Description</h5>
