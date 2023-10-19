@@ -31,6 +31,7 @@ function SelfLink(node, mouse) {
     this.anchorAngle = 0;
     this.mouseOffsetAngle = 0;
     this.text = '';
+    this.fontSize = fontSize
 
 
     if (mouse) {
@@ -53,9 +54,9 @@ SelfLink.prototype.setAnchorPoint = function (x, y) {
 };
 
 SelfLink.prototype.getEndPointsAndCircle = function () {
-    var circleX = this.node.x + 1.5 * nodeRadius * Math.cos(this.anchorAngle);
-    var circleY = this.node.y + 1.5 * nodeRadius * Math.sin(this.anchorAngle);
-    var circleRadius = 0.75 * nodeRadius;
+    var circleX = this.node.x + 1.5 * this.node.radius * Math.cos(this.anchorAngle);
+    var circleY = this.node.y + 1.5 * this.node.radius * Math.sin(this.anchorAngle);
+    var circleRadius = 0.75 * this.node.radius;
     var startAngle = this.anchorAngle - Math.PI * 0.8;
     var endAngle = this.anchorAngle + Math.PI * 0.8;
     var startX = circleX + circleRadius * Math.cos(startAngle);
@@ -76,17 +77,17 @@ SelfLink.prototype.getEndPointsAndCircle = function () {
     };
 };
 
-SelfLink.prototype.draw = function (c) {
-    var stuff = this.getEndPointsAndCircle();
+SelfLink.prototype.draw = function (c, mode) {
+    const stuff = this.getEndPointsAndCircle();
     // draw arc
     c.beginPath();
     c.arc(stuff.circleX, stuff.circleY, stuff.circleRadius, stuff.startAngle, stuff.endAngle, false);
-    stroke_theme_based(c)
+    stroke_theme_based(c, mode)
 
     // draw the text on the loop farthest from the node
-    var textX = stuff.circleX + stuff.circleRadius * Math.cos(this.anchorAngle);
-    var textY = stuff.circleY + stuff.circleRadius * Math.sin(this.anchorAngle);
-    drawText(c, this.text, textX, textY, this.anchorAngle, selectedObject == this);
+    const textX = stuff.circleX + stuff.circleRadius * Math.cos(this.anchorAngle);
+    const textY = stuff.circleY + stuff.circleRadius * Math.sin(this.anchorAngle);
+    drawText(c, this.text, textX, textY, this.anchorAngle, this.fontSize,true,  selectedObject === this);
     // draw the head of the arrow
     drawArrow(c, stuff.endX, stuff.endY, stuff.endAngle + Math.PI * 0.4);
 };
@@ -104,6 +105,7 @@ function StartLink(node, start) {
     this.deltaX = 0;
     this.deltaY = 0;
     this.text = '';
+    this.fontSize = fontSize
 
     this.outputs = {};
 
@@ -138,7 +140,7 @@ StartLink.prototype.getEndPoints = function () {
 };
 
 StartLink.prototype.draw = function (c) {
-    var stuff = this.getEndPoints();
+    const stuff = this.getEndPoints();
 
     // draw the line
     c.beginPath();
@@ -148,20 +150,20 @@ StartLink.prototype.draw = function (c) {
 
 
     // draw the text at the end without the arrow
-    var textAngle = Math.atan2(stuff.startY - stuff.endY, stuff.startX - stuff.endX);
-    drawText(c, this.text, stuff.startX, stuff.startY, textAngle, selectedObject == this);
+    const textAngle = Math.atan2(stuff.startY - stuff.endY, stuff.startX - stuff.endX);
+    drawText(c, this.text, stuff.startX, stuff.startY, textAngle, this.fontSize, true, selectedObject === this);
 
     // draw the head of the arrow
     drawArrow(c, stuff.endX, stuff.endY, Math.atan2(-this.deltaY, -this.deltaX));
 };
 
 StartLink.prototype.containsPoint = function (x, y) {
-    var stuff = this.getEndPoints();
-    var dx = stuff.endX - stuff.startX;
-    var dy = stuff.endY - stuff.startY;
-    var length = Math.sqrt(dx * dx + dy * dy);
-    var percent = (dx * (x - stuff.startX) + dy * (y - stuff.startY)) / (length * length);
-    var distance = (dx * (y - stuff.startY) - dy * (x - stuff.startX)) / length;
+    const stuff = this.getEndPoints();
+    const dx = stuff.endX - stuff.startX;
+    const dy = stuff.endY - stuff.startY;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const percent = (dx * (x - stuff.startX) + dy * (y - stuff.startY)) / (length * length);
+    const distance = (dx * (y - stuff.startY) - dy * (x - stuff.startX)) / length;
     return (percent > 0 && percent < 1 && Math.abs(distance) < hitTargetPadding);
 };
 
@@ -192,6 +194,7 @@ function Link(a, b) {
     this.parallelPart = 0.5; // percentage from nodeA to nodeB
     this.perpendicularPart = 0; // pixels from line between nodeA and nodeB
 
+    this.fontSize = fontSize;
     this.json_model = {};
 }
 
@@ -256,8 +259,8 @@ Link.prototype.getEndPointsAndCircle = function () {
     const circle = circleFromThreePoints(this.nodeA.x, this.nodeA.y, this.nodeB.x, this.nodeB.y, anchor.x, anchor.y);
     const isReversed = (this.perpendicularPart > 0);
     const reverseScale = isReversed ? 1 : -1;
-    const startAngle = Math.atan2(this.nodeA.y - circle.y, this.nodeA.x - circle.x) - reverseScale * nodeRadius / circle.radius;
-    const endAngle = Math.atan2(this.nodeB.y - circle.y, this.nodeB.x - circle.x) + reverseScale * nodeRadius / circle.radius;
+    const startAngle = Math.atan2(this.nodeA.y - circle.y, this.nodeA.x - circle.x) - reverseScale * this.nodeA.radius / circle.radius;
+    const endAngle = Math.atan2(this.nodeB.y - circle.y, this.nodeB.x - circle.x) + reverseScale * this.nodeB.radius / circle.radius;
     const startX = circle.x + circle.radius * Math.cos(startAngle);
     const startY = circle.y + circle.radius * Math.sin(startAngle);
     const endX = circle.x + circle.radius * Math.cos(endAngle);
@@ -308,12 +311,12 @@ Link.prototype.draw = function (c, color) {
         const textAngle = (startAngle + endAngle) / 2 + stuff.isReversed * Math.PI;
         const textX = stuff.circleX + stuff.circleRadius * Math.cos(textAngle);
         const textY = stuff.circleY + stuff.circleRadius * Math.sin(textAngle);
-        drawText(c, this.text, textX, textY, textAngle, selectedObject == this);
+        drawText(c, this.text, textX, textY, textAngle, this.fontSize, true, selectedObject === this);
     } else {
         const textX = (stuff.startX + stuff.endX) / 2;
         const textY = (stuff.startY + stuff.endY) / 2;
         const textAngle = Math.atan2(stuff.endX - stuff.startX, stuff.startY - stuff.endY);
-        drawText(c, this.text, textX, textY, textAngle + this.lineAngleAdjust, selectedObject == this);
+        drawText(c, this.text, textX, textY, textAngle + this.lineAngleAdjust, this.fontSize, true, selectedObject === this);
     }
 };
 
@@ -361,16 +364,29 @@ function Node(x, y) {
     this.isAcceptState = false;
     this.text = '';
     this.outputs = {}
+    this.radius = nodeRadius
+    this.fontSize = fontSize
 
     this.json_model = {};
 
 }
 
 Node.prototype.getJson = function () {
-    if (!this.isAcceptState)
-        return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": false}
-    else
-        return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": true}
+
+
+    if (!this.isAcceptState) {
+        if (this.json_model["outputs"]) {
+            return {...this.json_model, "name": this.text, "isAcceptState": false}
+        } else {
+            return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": false}
+        }
+    } else {
+        if (this.json_model["outputs"]) {
+            return {...this.json_model, "name": this.text, "isAcceptState": true}
+        } else {
+            return {...this.json_model, "name": this.text, "outputs": this.outputs, "isAcceptState": true}
+        }
+    }
 }
 
 
@@ -402,32 +418,32 @@ Node.prototype.setAnchorPoint = function (x, y) {
 Node.prototype.draw = function (c, mode) {
     // draw the circle
     c.beginPath();
-    c.arc(this.x, this.y, nodeRadius, 0, 2 * Math.PI, false);
+    c.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
     stroke_theme_based(c, mode)
 
     // draw the text
-    drawText(c, this.text, this.x, this.y, null, selectedObject === this);
+    drawText(c, this.text, this.x, this.y, null, this.fontSize, false, selectedObject === this);
 
     // draw a double circle for an accept state
     if (this.isAcceptState) {
         c.beginPath();
-        c.arc(this.x, this.y, nodeRadius - 6, 0, 2 * Math.PI, false);
+        c.arc(this.x, this.y, this.radius - 6, 0, 2 * Math.PI, false);
         stroke_theme_based(c, mode)
     }
 };
 
 Node.prototype.closestPointOnCircle = function (x, y) {
-    var dx = x - this.x;
-    var dy = y - this.y;
-    var scale = Math.sqrt(dx * dx + dy * dy);
+    const dx = x - this.x;
+    const dy = y - this.y;
+    const scale = Math.sqrt(dx * dx + dy * dy);
     return {
-        'x': this.x + dx * nodeRadius / scale,
-        'y': this.y + dy * nodeRadius / scale,
+        'x': this.x + dx * this.radius / scale,
+        'y': this.y + dy * this.radius / scale,
     };
 };
 
 Node.prototype.containsPoint = function (x, y) {
-    return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < nodeRadius * nodeRadius;
+    return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < this.radius * this.radius;
 };
 
 /* ADDED VARS */
@@ -501,7 +517,7 @@ function create_json_editor() {
     }
 
     editor = new JSONEditor(container, options)
-    container.setAttribute("style", `width:${300 * screenRatio}px`)
+    container.setAttribute("style", `width:${400 * screenRatio}px`)
 
     // set json
     const initialJson = {
@@ -608,7 +624,6 @@ function check_if_mobile_small() {
         }
         return false
     }
-    return false
 }
 
 window.addEventListener("resize", check_if_mobile_small);
@@ -671,19 +686,28 @@ function canvasHasFocus() {
     return in_canvas;
 }
 
-function drawText(c, originalText, x, y, angleOrNull, isSelected) {
-    let text = convertLatexShortcuts(originalText);
-    c.font = '20px "Times New Roman", serif';
-    let width = c.measureText(text).width;
+function drawText(c, originalText, x, y, angleOrNull, fontSize, isLink, isSelected) {
+    c.font = `${fontSize}px "Times New Roman", serif`;
+
+
+    let lines = originalText.split("\n")
+    let max_width = 0
+    for (let i = 0; i < lines.length; i++) {
+        lines[i] = convertLatexShortcuts(lines[i])
+        let width = c.measureText(lines[i]).width
+        if (width > max_width) max_width = width
+    }
 
     // center the text
-    x -= width / 2;
+    let x_c = x
+    x -= max_width / 2;
+
 
     // position the text intelligently if given an angle
     if (angleOrNull != null) {
         let cos = Math.cos(angleOrNull);
         let sin = Math.sin(angleOrNull);
-        let cornerPointX = (width / 2 + 5) * (cos > 0 ? 1 : -1);
+        let cornerPointX = (max_width / 2 + 5) * (cos > 0 ? 1 : -1);
         let cornerPointY = (10 + 5) * (sin > 0 ? 1 : -1);
         let slide = sin * Math.pow(Math.abs(sin), 40) * cornerPointX - cos * Math.pow(Math.abs(cos), 10) * cornerPointY;
         x += cornerPointX - sin * slide;
@@ -692,17 +716,37 @@ function drawText(c, originalText, x, y, angleOrNull, isSelected) {
 
     // draw text and caret (round the coordinates so the caret falls on a pixel)
     if ('advancedFillText' in c) {
-        c.advancedFillText(text, originalText, x + width / 2, y, angleOrNull);
+        c.advancedFillText(convertLatexShortcuts(originalText), originalText, x + max_width / 2, y, angleOrNull);
     } else {
-        x = Math.round(x);
-        y = Math.round(y);
-        c.fillText(text, x, y + 6);
+        if (isLink) {
+            x = Math.round(x);
+            y = Math.round(y);
+            c.fillText(convertLatexShortcuts(originalText), x, y + 6);
+        } else {
+            y = Math.round(y) - (lines.length - 1) * fontSize / 2;
+            let dx
+            for (let i = 0; i < lines.length; i++) {
+                dx = Math.round(c.measureText(lines[i]).width);
+                c.fillText(lines[i], x_c - dx / 2, y + 6 + i * fontSize)
+            }
+        }
+
+
         if (isSelected && caretVisible && canvasHasFocus() && document.hasFocus()) {
-            x += width;
-            c.beginPath();
-            c.moveTo(x, y - 10);
-            c.lineTo(x, y + 10);
-            c.stroke();
+            if (isLink) {
+                x += max_width;
+                c.beginPath();
+                c.moveTo(x, y - fontSize / 2);
+                c.lineTo(x, y + fontSize / 2);
+                c.stroke();
+            } else {
+                x += max_width / 2
+                x += c.measureText(lines[lines.length - 1]).width / 2
+                c.beginPath();
+                c.moveTo(x, y + (fontSize * (lines.length - 1)) + fontSize / 2);
+                c.lineTo(x, y + (fontSize * (lines.length - 1)) - fontSize / 2);
+                c.stroke();
+            }
         }
     }
 }
@@ -720,6 +764,7 @@ let theme = "light"
 let canvas;
 let panel;
 let nodeRadius = 45;
+let fontSize = 20;
 let nodes = [];
 let links = [];
 let snapToPadding = 6; // pixels
@@ -777,11 +822,13 @@ window.onload = function () {
     panel = document.getElementById('panel');
     canvas.setAttribute("width", `${1200 * screen.width / 2000}px`);
     canvas.setAttribute("height", `${700}px`);
-    panel.setAttribute("width", `${300 * screen.width / 2000}px`)
+    panel.setAttribute("width", `${400 * screen.width / 2000}px`)
 
     create_json_editor();
     restoreBackup();
     draw();
+
+    console.log(nodes)
 
     canvas.onmousedown = function (e) {
         const mouse = crossBrowserRelativeMousePos(e);
@@ -845,6 +892,7 @@ window.onload = function () {
 
     canvas.onmousemove = function (e) {
         const mouse = crossBrowserRelativeMousePos(e);
+
 
         if (currentLink != null) {
             let targetNode = selectObject(mouse.x, mouse.y);
@@ -938,8 +986,38 @@ document.onkeydown = function (e) {
         }
     }
 
+    if (shift && key.includes("Arrow") && selectedObject) {
+        if (key === "ArrowUp") {
+            e.preventDefault()
+            selectedObject.radius += 2.5
+        }
+        if (key === "ArrowDown") {
+            e.preventDefault()
+            selectedObject.radius -= 2
+            selectedObject.radius = Math.max(selectedObject.radius, 0)
+        }
+        if (key === "ArrowRight") {
+            e.preventDefault()
+            selectedObject.fontSize += 2.5
+        }
+        if (key === "ArrowLeft") {
+            e.preventDefault()
+            selectedObject.fontSize -= 2
+            selectedObject.fontSize = Math.max(selectedObject.fontSize, 0)
+        }
+
+        return true
+    }
+
     if (!e.metaKey && !e.altKey && !e.ctrlKey && e.key !== "Tab" && selectedObject != null) {
         if (key === "Shift" && in_canvas) {
+            return true
+        }
+
+        if (key === "Enter" && in_canvas) {
+            selectedObject.text += "\n"
+            resetCaret()
+            draw()
             return true
         }
         if (key === " " && in_canvas) {
@@ -1067,7 +1145,7 @@ async function copyToClipboard(textToCopy) {
             const textArea = document.createElement("textarea");
             textArea.value = textToCopy;
 
-            // Move textarea out of the viewport so it's not visible
+            // Move textarea out of the viewport, so it's not visible
             textArea.style.position = "absolute";
             textArea.style.left = "-999999px";
 
@@ -1111,28 +1189,32 @@ function restoreBackup() {
     }
 
     try {
-        var backup = JSON.parse(localStorage['fsm']);
+        const backup = JSON.parse(localStorage['fsm']);
 
-        for (var i = 0; i < backup.nodes.length; i++) {
-            var backupNode = backup.nodes[i];
-            var node = new Node(backupNode.x, backupNode.y);
+        for (let i = 0; i < backup.nodes.length; i++) {
+            const backupNode = backup.nodes[i];
+            const node = new Node(backupNode.x, backupNode.y);
             node.isAcceptState = backupNode.isAcceptState;
             node.text = backupNode.text;
+            node.radius = backupNode.radius;
+            node.json_model = JSON.parse(backupNode.json_model)
+            node.fontSize = backupNode.fontSize
             nodes.push(node);
         }
-        for (var i = 0; i < backup.links.length; i++) {
-            var backupLink = backup.links[i];
-            var link = null;
-            if (backupLink.type == 'SelfLink') {
+
+        for (let i = 0; i < backup.links.length; i++) {
+            const backupLink = backup.links[i];
+            let link = null;
+            if (backupLink.type === 'SelfLink') {
                 link = new SelfLink(nodes[backupLink.node]);
                 link.anchorAngle = backupLink.anchorAngle;
                 link.text = backupLink.text;
-            } else if (backupLink.type == 'StartLink') {
+            } else if (backupLink.type === 'StartLink') {
                 link = new StartLink(nodes[backupLink.node]);
                 link.deltaX = backupLink.deltaX;
                 link.deltaY = backupLink.deltaY;
                 link.text = backupLink.text;
-            } else if (backupLink.type == 'Link') {
+            } else if (backupLink.type === 'Link') {
                 link = new Link(nodes[backupLink.nodeA], nodes[backupLink.nodeB]);
                 link.parallelPart = backupLink.parallelPart;
                 link.perpendicularPart = backupLink.perpendicularPart;
@@ -1153,23 +1235,26 @@ function saveBackup() {
         return;
     }
 
-    var backup = {
+    const backup = {
         'nodes': [],
         'links': [],
     };
-    for (var i = 0; i < nodes.length; i++) {
-        var node = nodes[i];
-        var backupNode = {
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        const backupNode = {
             'x': node.x,
             'y': node.y,
+            'radius': node.radius,
             'text': node.text,
             'isAcceptState': node.isAcceptState,
+            'json_model': JSON.stringify(node.json_model),
+            'fontSize': node.fontSize
         };
         backup.nodes.push(backupNode);
     }
-    for (var i = 0; i < links.length; i++) {
-        var link = links[i];
-        var backupLink = null;
+    for (let i = 0; i < links.length; i++) {
+        const link = links[i];
+        let backupLink = null;
         if (link instanceof SelfLink) {
             backupLink = {
                 'type': 'SelfLink',
