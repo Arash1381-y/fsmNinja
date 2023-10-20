@@ -31,12 +31,28 @@ function SelfLink(node, mouse) {
     this.anchorAngle = 0;
     this.mouseOffsetAngle = 0;
     this.text = '';
+    this.linkId = null
     this.fontSize = fontSize
+    this.json_model = {}
 
 
     if (mouse) {
         this.setAnchorPoint(mouse.x, mouse.y);
     }
+}
+
+
+SelfLink.prototype.setJsonModel = function (json) {
+    if (json.hasOwnProperty('name')) {
+        this.text = json.name
+    }
+
+    this.json_model = json
+}
+
+SelfLink.prototype.getJson = function () {
+    // return json obj based on this.txt and this.output
+    return {...this.json_model, "name": this.text}
 }
 
 SelfLink.prototype.setMouseStart = function (x, y) {
@@ -46,7 +62,7 @@ SelfLink.prototype.setMouseStart = function (x, y) {
 SelfLink.prototype.setAnchorPoint = function (x, y) {
     this.anchorAngle = Math.atan2(y - this.node.y, x - this.node.x) + this.mouseOffsetAngle;
     // snap to 90 degrees
-    var snap = Math.round(this.anchorAngle / (Math.PI / 2)) * (Math.PI / 2);
+    const snap = Math.round(this.anchorAngle / (Math.PI / 2)) * (Math.PI / 2);
     if (Math.abs(this.anchorAngle - snap) < 0.1) this.anchorAngle = snap;
     // keep in the range -pi to pi so our containsPoint() function always works
     if (this.anchorAngle < -Math.PI) this.anchorAngle += 2 * Math.PI;
@@ -54,15 +70,15 @@ SelfLink.prototype.setAnchorPoint = function (x, y) {
 };
 
 SelfLink.prototype.getEndPointsAndCircle = function () {
-    var circleX = this.node.x + 1.5 * this.node.radius * Math.cos(this.anchorAngle);
-    var circleY = this.node.y + 1.5 * this.node.radius * Math.sin(this.anchorAngle);
-    var circleRadius = 0.75 * this.node.radius;
-    var startAngle = this.anchorAngle - Math.PI * 0.8;
-    var endAngle = this.anchorAngle + Math.PI * 0.8;
-    var startX = circleX + circleRadius * Math.cos(startAngle);
-    var startY = circleY + circleRadius * Math.sin(startAngle);
-    var endX = circleX + circleRadius * Math.cos(endAngle);
-    var endY = circleY + circleRadius * Math.sin(endAngle);
+    const circleX = this.node.x + 1.5 * this.node.radius * Math.cos(this.anchorAngle);
+    const circleY = this.node.y + 1.5 * this.node.radius * Math.sin(this.anchorAngle);
+    const circleRadius = 0.75 * this.node.radius;
+    const startAngle = this.anchorAngle - Math.PI * 0.8;
+    const endAngle = this.anchorAngle + Math.PI * 0.8;
+    const startX = circleX + circleRadius * Math.cos(startAngle);
+    const startY = circleY + circleRadius * Math.sin(startAngle);
+    const endX = circleX + circleRadius * Math.cos(endAngle);
+    const endY = circleY + circleRadius * Math.sin(endAngle);
     return {
         'hasCircle': true,
         'startX': startX,
@@ -87,16 +103,16 @@ SelfLink.prototype.draw = function (c, mode) {
     // draw the text on the loop farthest from the node
     const textX = stuff.circleX + stuff.circleRadius * Math.cos(this.anchorAngle);
     const textY = stuff.circleY + stuff.circleRadius * Math.sin(this.anchorAngle);
-    drawText(c, this.text, textX, textY, this.anchorAngle, this.fontSize,true,  selectedObject === this);
+    drawText(c, this.text, textX, textY, this.anchorAngle, this.fontSize, true, selectedObject === this);
     // draw the head of the arrow
     drawArrow(c, stuff.endX, stuff.endY, stuff.endAngle + Math.PI * 0.4);
 };
 
 SelfLink.prototype.containsPoint = function (x, y) {
-    var stuff = this.getEndPointsAndCircle();
-    var dx = x - stuff.circleX;
-    var dy = y - stuff.circleY;
-    var distance = Math.sqrt(dx * dx + dy * dy) - stuff.circleRadius;
+    const stuff = this.getEndPointsAndCircle();
+    const dx = x - stuff.circleX;
+    const dy = y - stuff.circleY;
+    const distance = Math.sqrt(dx * dx + dy * dy) - stuff.circleRadius;
     return (Math.abs(distance) < hitTargetPadding);
 };
 
@@ -105,6 +121,7 @@ function StartLink(node, start) {
     this.deltaX = 0;
     this.deltaY = 0;
     this.text = '';
+    this.linkId = null
     this.fontSize = fontSize
 
     this.outputs = {};
@@ -188,6 +205,7 @@ function Link(a, b) {
     this.nodeA = a;
     this.nodeB = b;
     this.text = '';
+    this.linkId = null
     this.lineAngleAdjust = 0; // value to add to textAngle when link is straight line
 
     // make anchor point relative to the locations of nodeA and nodeB
@@ -198,10 +216,6 @@ function Link(a, b) {
     this.json_model = {};
 }
 
-Link.prototype.getJson = function () {
-    // return json obj based on this.txt and this.output
-    return {...this.json_model, "name": this.text}
-}
 
 Link.prototype.setJsonModel = function (json) {
     if (json.hasOwnProperty('name')) {
@@ -209,6 +223,11 @@ Link.prototype.setJsonModel = function (json) {
     }
 
     this.json_model = json
+}
+
+Link.prototype.getJson = function () {
+    // return json obj based on this.txt and this.output
+    return {...this.json_model, "name": this.text}
 }
 
 
@@ -366,6 +385,7 @@ function Node(x, y) {
     this.outputs = {}
     this.radius = nodeRadius
     this.fontSize = fontSize
+    this.nodeId = null
 
     this.json_model = {};
 
@@ -636,6 +656,63 @@ function clear_canvas() {
 }
 
 
+// Add a click event listener to the card
+function init_uploader() {
+
+    // Get a reference to the card element with file input
+    const card = document.getElementById("json-container");
+
+// Get a reference to the hidden input element
+    const jsonUpload = document.getElementById("json-upload");
+
+    card.onclick = () => {
+        jsonUpload.click();
+    }
+
+    jsonUpload.onchange = () => {
+
+        const file = jsonUpload.files[0];
+        if (file) {
+            if (file.size > 10485760) {
+                failedToast("Input file is too large 😱")
+                return
+            }
+            // Check if the file name ends with ".json"
+            if (file.name.endsWith(".json")) {
+
+                // Read the file content as text
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const fileContent = event.target.result;
+
+                    // Parse the JSON content
+                    try {
+                        const jsonObject = JSON.parse(fileContent);
+                        restore(jsonObject)
+                        draw()
+                        successToast("Draw successfully 🤩")
+                    } catch (error) {
+                        failedToast("Error parsing the JSON 😥");
+                    }
+                };
+                reader.readAsText(file);
+
+
+            } else {
+                // It's not a JSON file, log an error
+                failedToast("Only Json file is supported 😬")
+            }
+            jsonUpload.value = null;
+        }
+    }
+}
+
+const uniqueId = () => {
+    const dateString = Date.now().toString(36);
+    const randomness = Math.random().toString(36).substr(2);
+    return dateString + randomness;
+};
+
 /*-------------------------------------------------------------*/
 
 
@@ -776,10 +853,9 @@ let originalClick;
 const screenRatio = screen.width / 2000
 
 function draw() {
-
-
-    if (in_canvas && (selectedObject instanceof Node || selectedObject instanceof Link))
+    if (in_canvas && (selectedObject instanceof Node || selectedObject instanceof Link || selectedObject instanceof SelfLink)) {
         set_editor_content(selectedObject.getJson())
+    }
 
 
     drawUsing(canvas.getContext('2d'));
@@ -825,10 +901,9 @@ window.onload = function () {
     panel.setAttribute("width", `${400 * screen.width / 2000}px`)
 
     create_json_editor();
-    restoreBackup();
+    restore();
     draw();
-
-    console.log(nodes)
+    init_uploader()
 
     canvas.onmousedown = function (e) {
         const mouse = crossBrowserRelativeMousePos(e);
@@ -836,7 +911,7 @@ window.onload = function () {
 
         // if selectedObject is not null than save the json of the editor into the node
         const json = get_editor_content()
-        if (selectedObject != null && selectedObject instanceof Node) {
+        if (selectedObject != null && (selectedObject instanceof Node || selectedObject instanceof Link || selectedObject instanceof SelfLink)) {
             selectedObject.setJsonModel(json)
         }
 
@@ -880,6 +955,7 @@ window.onload = function () {
 
         if (selectedObject == null) {
             selectedObject = new Node(mouse.x, mouse.y);
+            selectedObject.nodeId = uniqueId()
             nodes.push(selectedObject);
             resetCaret();
             draw();
@@ -933,6 +1009,7 @@ window.onload = function () {
         if (currentLink != null) {
             if (!(currentLink instanceof TemporaryLink)) {
                 selectedObject = currentLink;
+                currentLink.linkId = uniqueId()
                 links.push(currentLink);
                 resetCaret();
             }
@@ -1082,7 +1159,7 @@ function saveAsPNG() {
         navigator.clipboard.write([new ClipboardItem({'image/png': blob})])
     })
 
-    successToast()
+    successToast("Copied to clipboard  \t\t😊")
 }
 
 function saveAsSVG() {
@@ -1112,9 +1189,9 @@ function saveAsJson() {
 }
 
 
-function successToast() {
+function successToast(msg) {
     Toastify({
-        text: "Copied to clipboard  \t\t🤪",
+        text: msg,
         classname: "info",
         duration: 3000,
         offset: 50,
@@ -1124,7 +1201,28 @@ function successToast() {
         style: {
             background: "linear-gradient(to right, #00b09b, #96c93d)",
             height: "45px",
-            width: "240px"
+            width: "300px"
+        },
+        onClick: function () {
+        } // Callback after click
+    }).showToast();
+}
+
+
+function failedToast(msg) {
+    Toastify({
+        text: msg,
+        classname: "info",
+        duration: 3000,
+        offset: 50,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+            background: "rgb(101,54,46)",
+            background: "linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))",
+            height: "45px",
+            width: "300px"
         },
         onClick: function () {
         } // Callback after click
@@ -1138,7 +1236,7 @@ async function copyToClipboard(textToCopy) {
     try {
         if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(textToCopy);
-            successToast()
+            successToast("Copied to clipboard  \t\t😊")
 
         } else {
             // Use the 'out of viewport hidden text area' trick
@@ -1183,50 +1281,187 @@ function fixed(number, digits) {
     return number.toFixed(digits).replace(/0+$/, '').replace(/\.$/, '');
 }
 
-function restoreBackup() {
-    if (!localStorage || !JSON) {
+function json_base_construct(obj) {
+
+
+    if (obj) {
+        nodes = []
+        links = []
+
+        try {
+            for (let i = 0; i < obj.nodes.length; i++) {
+                const storedNode = obj.nodes[i]
+                const drawProp = JSON.parse(storedNode.draw_prop)
+
+                const node = new Node(drawProp.x, drawProp.y)
+                node.isAcceptState = storedNode.isAcceptState
+                node.text = storedNode.name
+                node.outputs = storedNode.outputs
+                node.nodeId = storedNode.node_id
+
+                node.radius = drawProp.radius
+                node.fontSize = drawProp.fontSize
+
+
+                // extract all the other fields as json_model
+                const json_model = {}
+                for (const property in storedNode) {
+                    if (storedNode.hasOwnProperty(property) && !node.hasOwnProperty(property) && property !== "draw_prop" && property !== "node_id") {
+                        json_model[property] = storedNode[property]
+                    }
+                }
+
+                node.json_model = json_model
+                nodes.push(node)
+            }
+
+
+            for (let i = 0; i < obj.links.length; i++) {
+                const storedLink = obj.links[i];
+                const drawProp = JSON.parse(storedLink.draw_prop)
+                let link = null;
+
+                if (drawProp.type === 'SelfLink') {
+
+                    let linkNode = null
+
+                    for (let j = 0; j < nodes.length; j++) {
+                        if (nodes[j].nodeId === storedLink.source_id) {
+                            linkNode = nodes[j]
+                            break
+                        }
+                    }
+
+
+                    link = new SelfLink(linkNode);
+                    link.anchorAngle = drawProp.anchorAngle;
+
+
+                } else if (drawProp.type === 'Link') {
+
+
+                    let linkNodeA = null
+                    let linkNodeB = null
+
+                    for (let j = 0; j < nodes.length; j++) {
+                        if (nodes[j].nodeId === storedLink.source_id) {
+                            linkNodeA = nodes[j]
+                        }
+                    }
+
+                    for (let j = 0; j < nodes.length; j++) {
+                        if (nodes[j].nodeId === storedLink.dest_id) {
+                            linkNodeB = nodes[j]
+                        }
+                    }
+
+
+                    link = new Link(linkNodeA, linkNodeB);
+                    link.parallelPart = drawProp.parallelPart
+                    link.perpendicularPart = drawProp.perpendicularPart
+                    link.lineAngleAdjust = drawProp.lineAngleAdjust
+                }
+
+                if (link != null) {
+                    link.fontSize = drawProp.fontSize
+                    link.linkId = storedLink.link_id
+                    link.text = storedLink.name;
+
+                    // extract all the other fields as json_model
+                    const json_model = {}
+                    for (const property in storedLink) {
+                        if (storedLink.hasOwnProperty(property) && !link.hasOwnProperty(property)
+                            && property !== "draw_prop" && property !== "link_id"
+                            && property !== "source" && property !== "source_id"
+                            && property !== "dest" && property !== "dest_id"
+
+                        ) {
+                            json_model[property] = storedLink[property]
+                        }
+                    }
+                    link.json_model = json_model
+                    links.push(link);
+                }
+
+            }
+
+
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+
+}
+
+
+function restore(obj) {
+
+    if (obj) {
+        json_base_construct(obj)
         return;
     }
 
-    try {
-        const backup = JSON.parse(localStorage['fsm']);
 
-        for (let i = 0; i < backup.nodes.length; i++) {
-            const backupNode = backup.nodes[i];
-            const node = new Node(backupNode.x, backupNode.y);
-            node.isAcceptState = backupNode.isAcceptState;
-            node.text = backupNode.text;
-            node.radius = backupNode.radius;
-            node.json_model = JSON.parse(backupNode.json_model)
-            node.fontSize = backupNode.fontSize
-            nodes.push(node);
-        }
+    if ((!localStorage || !JSON || !localStorage['fsm'])) {
+        return;
+    }
 
-        for (let i = 0; i < backup.links.length; i++) {
-            const backupLink = backup.links[i];
-            let link = null;
-            if (backupLink.type === 'SelfLink') {
-                link = new SelfLink(nodes[backupLink.node]);
-                link.anchorAngle = backupLink.anchorAngle;
-                link.text = backupLink.text;
-            } else if (backupLink.type === 'StartLink') {
-                link = new StartLink(nodes[backupLink.node]);
-                link.deltaX = backupLink.deltaX;
-                link.deltaY = backupLink.deltaY;
-                link.text = backupLink.text;
-            } else if (backupLink.type === 'Link') {
-                link = new Link(nodes[backupLink.nodeA], nodes[backupLink.nodeB]);
-                link.parallelPart = backupLink.parallelPart;
-                link.perpendicularPart = backupLink.perpendicularPart;
-                link.text = backupLink.text;
-                link.lineAngleAdjust = backupLink.lineAngleAdjust;
+
+    obj = JSON.parse(localStorage['fsm']);
+    {
+        try {
+            for (let i = 0; i < obj.nodes.length; i++) {
+                const backupNode = obj.nodes[i];
+                const node = new Node(backupNode.x, backupNode.y);
+                node.isAcceptState = backupNode.isAcceptState ?? false;
+                node.text = backupNode.text ?? "";
+                node.radius = backupNode.radius ?? nodeRadius;
+                node.nodeId = backupNode.nodeId
+                if (backupNode.json_model)
+                    node.json_model = JSON.parse(backupNode.json_model)
+                else
+                    node.json_model = {}
+                node.fontSize = backupNode.fontSize ?? fontSize;
+                nodes.push(node);
             }
-            if (link != null) {
-                links.push(link);
+
+            for (let i = 0; i < obj.links.length; i++) {
+                const backupLink = obj.links[i];
+                let link = null;
+
+                if (backupLink.type === 'SelfLink') {
+                    link = new SelfLink(nodes[backupLink.node]);
+                    link.anchorAngle = backupLink.anchorAngle;
+                    if (backupLink.json_model)
+                        link.json_model = JSON.parse(backupLink.json_model)
+                    else
+                        backupLink.json_model = {}
+                } else if (backupLink.type === 'StartLink') {
+                    link = new StartLink(nodes[backupLink.node]);
+                    link.deltaX = backupLink.deltaX ?? 0;
+                    link.deltaY = backupLink.deltaY ?? 0;
+                } else if (backupLink.type === 'Link') {
+                    link = new Link(nodes[backupLink.nodeA], nodes[backupLink.nodeB]);
+                    link.parallelPart = backupLink.parallelPart ?? 0.5;
+                    link.perpendicularPart = backupLink.perpendicularPart ?? 0;
+                    link.lineAngleAdjust = backupLink.lineAngleAdjust ?? 0;
+                    if (backupLink.json_model)
+                        link.json_model = JSON.parse(backupLink.json_model)
+                    else
+                        backupLink.json_model = {}
+                }
+
+                if (link != null) {
+                    link.linkId = backupLink.linkId
+                    link.text = backupLink.text ?? "";
+                    links.push(link);
+                }
+
             }
+        } catch (e) {
+            localStorage['fsm'] = '';
         }
-    } catch (e) {
-        localStorage['fsm'] = '';
     }
 }
 
@@ -1248,7 +1483,8 @@ function saveBackup() {
             'text': node.text,
             'isAcceptState': node.isAcceptState,
             'json_model': JSON.stringify(node.json_model),
-            'fontSize': node.fontSize
+            'fontSize': node.fontSize,
+            'nodeId': node.nodeId
         };
         backup.nodes.push(backupNode);
     }
@@ -1261,6 +1497,8 @@ function saveBackup() {
                 'node': nodes.indexOf(link.node),
                 'text': link.text,
                 'anchorAngle': link.anchorAngle,
+                'json_model': JSON.stringify(link.json_model),
+                'linkId': link.linkId,
             };
         } else if (link instanceof StartLink) {
             backupLink = {
@@ -1269,16 +1507,19 @@ function saveBackup() {
                 'text': link.text,
                 'deltaX': link.deltaX,
                 'deltaY': link.deltaY,
+                'linkId': link.linkId
             };
         } else if (link instanceof Link) {
             backupLink = {
                 'type': 'Link',
                 'nodeA': nodes.indexOf(link.nodeA),
                 'nodeB': nodes.indexOf(link.nodeB),
+                'json_model': JSON.stringify(link.json_model),
                 'text': link.text,
                 'lineAngleAdjust': link.lineAngleAdjust,
                 'parallelPart': link.parallelPart,
                 'perpendicularPart': link.perpendicularPart,
+                'linkId': link.linkId
             };
         }
         if (backupLink != null) {
@@ -1392,10 +1633,20 @@ function ExportAsJson() {
     for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i]
         obj.nodes.push({
+            ...node.json_model,
             name: node.text,
             outputs: node.outputs,
             isAcceptState: node.isAcceptState,
-            ...node.json_model
+            node_id: node.nodeId,
+
+            draw_prop: JSON.stringify(
+                {
+                    x: node.x,
+                    y: node.y,
+                    radius: node.radius,
+                    fontSize: node.fontSize,
+                }
+            )
         })
     }
 
@@ -1403,20 +1654,44 @@ function ExportAsJson() {
     for (let i = 0; i < links.length; i++) {
         const link = links[i]
 
-        if (link.node !== undefined) {
+        if (link instanceof SelfLink) {
             obj.links.push({
+                    ...link.json_model,
                     name: link.text,
                     source: link.node.text,
-                    dest: link.node.text,
-                    ...link.json_model
+                    source_id: link.node.nodeId,
+                    link_id: link.linkId,
+
+
+                    draw_prop: JSON.stringify(
+                        {
+                            type: "SelfLink",
+                            mouseOffsetAngle: link.mouseOffsetAngle,
+                            anchorAngle: link.anchorAngle,
+                            fontSize: link.fontSize
+                        }
+                    )
+
+
                 }
             )
-        } else {
+        } else if (link instanceof Link) {
             obj.links.push({
+                ...link.json_model,
                 name: link.text,
                 source: link.nodeA.text,
                 dest: link.nodeB.text,
-                ...link.json_model
+                source_id: link.nodeA.nodeId,
+                dest_id: link.nodeB.nodeId,
+                link_id: link.linkId,
+
+                draw_prop: JSON.stringify({
+                    type: "Link",
+                    lineAngleAdjust: link.lineAngleAdjust,
+                    parallelPart: link.parallelPart,
+                    perpendicularPart: link.perpendicularPart,
+                    fontSize: link.fontSize
+                })
             })
         }
     }

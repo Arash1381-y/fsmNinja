@@ -26,6 +26,27 @@
 
     <style>
 
+        .card {
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+            padding: 0.1rem;
+        }
+
+        .card-download {
+            background-image: url("assets/clipboard-plus-fill.svg");
+            background-size: 200px 125px;
+            background-repeat: no-repeat;
+            background-position-x: 0;
+            background-position-y: 4px;
+        }
+
+        .card-upload {
+            background-image: url("assets/file-arrow-up.svg");
+            background-size: 200px 125px;
+            background-repeat: no-repeat;
+            background-position-x: 0;
+            background-position-y: 4px;
+        }
 
         .card:hover {
             box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1);
@@ -119,34 +140,37 @@
 
 <div style="margin-left: 2rem; margin-right: 2rem;" class="p-2">
 
-    <div class="row">
-        <div class="col-sm-4">
-            <div class="card btn text-center bg-success border-0" onclick="saveAsJson();">
-                <div class="card-body">
-                    <h1 class="card-title text-white">JSON</h1>
-                    <p class="h-3 text-white"> Copy to Clipboard</p>
-                </div>
+
+    <div class="card-group">
+        <div id="json-container" class="btn text-center card  bg-danger rounded card-upload border-0">
+            <div class="card-body">
+                <input id="json-upload" style="display: none" type="file">
+
+                <h1 class="card-title text-white">JSON</h1>
+                <p class="h-3 text-white">Upload your JSON</p>
             </div>
         </div>
-        <div class="col-sm-4">
-            <div class="card btn text-center bg-warning border-0" onclick="saveAsLaTeX();">
-                <div class="card-body">
-                    <h1 class="card-title text-white">LATEX</h1>
-                    <p class="h-3 text-white"> Copy to Clipboard</p>
-                </div>
+        <div class="card btn text-center bg-warning rounded card-download border-0" onclick="saveAsLaTeX();">
+            <div class="card-body">
+                <h1 class="card-title text-white">LATEX</h1>
+                <p class="h-3 text-white"> Copy to Clipboard</p>
             </div>
         </div>
-        <div class="col-sm-4">
-            <div class="card btn text-center bg-primary" onclick="saveAsPNG();">
-                <div class="card-body">
-                    <h1 class="card-title text-white">PNG</h1>
-                    <p class="h-3 text-white"> Copy to Clipboard</p>
-                </div>
+        <div class="card btn text-center bg-primary rounded card-download border-0" onclick="saveAsPNG();">
+            <div class="card-body">
+                <h1 class="card-title text-white">PNG</h1>
+                <p class="h-3 text-white "> Copy to Clipboard</p>
+            </div>
+        </div>
+        <div class="card btn text-center bg-success rounded card-download border-0" onclick="saveAsJson();">
+            <div class="card-body">
+                <h1 class="card-title text-white">JSON</h1>
+                <p class="h-3 text-white"> Copy to Clipboard</p>
             </div>
         </div>
     </div>
-
 </div>
+
 
 <br>
 <br>
