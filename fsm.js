@@ -649,13 +649,6 @@ function check_if_mobile_small() {
 window.addEventListener("resize", check_if_mobile_small);
 
 
-function clear_canvas() {
-    nodes.splice(0, nodes.length)
-    links.splice(0, links.length)
-    draw()
-}
-
-
 // Add a click event listener to the card
 function init_uploader() {
 
@@ -712,6 +705,28 @@ const uniqueId = () => {
     const randomness = Math.random().toString(36).substr(2);
     return dateString + randomness;
 };
+
+
+/* CLEAR CANVAS PROP */
+let confirmWindow; // bootstrap modal to get confirm of clear canvas action
+
+function clear_canvas_confirm() {
+    clear_canvas()
+    confirmWindow.hide()
+}
+
+function clear_canvas_dismiss() {
+    confirmWindow.hide()
+}
+
+
+function clear_canvas() {
+    nodes.splice(0, nodes.length)
+    links.splice(0, links.length)
+    draw()
+
+
+}
 
 /*-------------------------------------------------------------*/
 
@@ -852,6 +867,7 @@ let movingObject = false;
 let originalClick;
 const screenRatio = screen.width / 2000
 
+
 function draw() {
     if (in_canvas && (selectedObject instanceof Node || selectedObject instanceof Link || selectedObject instanceof SelfLink)) {
         set_editor_content(selectedObject.getJson())
@@ -900,10 +916,12 @@ window.onload = function () {
     canvas.setAttribute("height", `${700}px`);
     panel.setAttribute("width", `${400 * screen.width / 2000}px`)
 
+    confirmWindow = new bootstrap.Modal(document.getElementById('confirmWindow'),)
     create_json_editor();
     restore();
     draw();
     init_uploader()
+
 
     canvas.onmousedown = function (e) {
         const mouse = crossBrowserRelativeMousePos(e);
@@ -1084,6 +1102,11 @@ document.onkeydown = function (e) {
         }
 
         return true
+    }
+
+    if (shift && key === "L") {
+        // open confirm modal
+        confirmWindow.show()
     }
 
     if (!e.metaKey && !e.altKey && !e.ctrlKey && e.key !== "Tab" && selectedObject != null) {
