@@ -231,7 +231,7 @@
 
 
 <div id="board">
-    <canvas class="rounded shadow-lg" id="canvas" style="background-color: #16191c;"></canvas>
+    <canvas class="rounded shadow-lg" id="canvas"></canvas>
     <div class="rounded bg-dark shadow-lg" id="panel">
         <div id="jsoneditor"></div>
 
@@ -275,8 +275,6 @@
 <br>
 <br>
 <div style="margin-left: 2rem; margin-right: 2rem;" class="p-2">
-
-
 
 
     <h2 class="display-1 text-primary fw-bolder border-bottom">Tutorial</h2>
@@ -371,6 +369,22 @@
         .
     </P>
 
+    <h4 class="display-6 text-primary">Clear</h4>
+
+    <h5>Action:</h5>
+    <p>
+        <mark>Shift + L</mark>
+        on canvas
+    </p>
+
+    <h5>Description</h5>
+    <P>
+        Remove all
+        <mark>states</mark>
+        and
+        <mark>links</mark>
+        .
+    </P>
 
     <h4 class="display-6 text-primary">Change Circle Radius</h4>
 
@@ -447,6 +461,23 @@
 
 </div>
 
+
+<!-- canvas clear modal -->
+<div class="modal fade" id="confirmWindow" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary" id="exampleModalLabel">Clear the canvas?</h5>
+            </div>
+            <div class="modal-body" style="direction: rtl">
+                <button type="button" class="btn btn-success m-1" data-bs-dismiss="modal"
+                        onclick="clear_canvas_confirm()">Yes
+                </button>
+                <button type="button" class="btn btn-danger m-1" onclick="clear_canvas_dismiss()">No</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 

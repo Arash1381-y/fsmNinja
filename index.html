@@ -113,7 +113,6 @@
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
 
-
 <nav class="navbar border-bottom border-body px-4 shadow-lg">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">DEVELOPED WITH LOVE ❤</a>
@@ -270,6 +269,23 @@
     </P>
 
 
+    <h4 class="display-6 text-primary">Clear</h4>
+
+    <h5>Action:</h5>
+    <p>
+        <mark>Shift + L</mark>
+        on canvas
+    </p>
+
+    <h5>Description</h5>
+    <P>
+        Remove all
+        <mark>states</mark>
+        and
+        <mark>links</mark>
+        .
+    </P>
+
     <h4 class="display-6 text-primary">Change Circle Radius</h4>
 
     <h5>Action:</h5>
@@ -343,8 +359,42 @@
         Can be used to add optional properties to the FSM.
     </P>
 
+
+    <h4 class="display-6 text-primary">Clear</h4>
+
+    <h5>Action:</h5>
+    <p>
+        <mark>Shift + L</mark>
+        on canvas
+    </p>
+
+    <h5>Description</h5>
+    <P>
+        Remove all
+        <mark>states</mark>
+        and
+        <mark>links</mark>
+        .
+    </P>
 </div>
 
+
+<!-- canvas clear modal -->
+<div class="modal fade" id="confirmWindow" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary" id="exampleModalLabel">Clear the canvas?</h5>
+            </div>
+            <div class="modal-body" style="direction: rtl">
+                <button type="button" class="btn btn-success m-1" data-bs-dismiss="modal"
+                        onclick="clear_canvas_confirm()">Yes
+                </button>
+                <button type="button" class="btn btn-danger m-1" onclick="clear_canvas_dismiss()">No</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 
